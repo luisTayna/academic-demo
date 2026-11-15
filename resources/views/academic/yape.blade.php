@@ -40,10 +40,15 @@
 <!-- QA Scenario Triggers Bar (The 4 Test Buttons) -->
 <div class="qa-scenarios-bar">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-        <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-vial-circle-check" style="color: #0084ff;"></i>
-            <span>Batería de Pruebas Funcionales Automatizadas (Rúbrica PA2)</span>
-        </h3>
+        <div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-vial-circle-check" style="color: #0084ff;"></i>
+                <span>Batería de Pruebas Funcionales Automatizadas (Rúbrica PA2)</span>
+            </h3>
+            <div style="font-size: 12px; color: #64748b; margin-top: 3px;">
+                Haga clic en cualquiera de los botones para disparar la prueba en tiempo real y contrastar los resultados del motor.
+            </div>
+        </div>
         <span style="font-size: 11.5px; background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-weight: 600;">
             <i class="fa-solid fa-code-branch" style="color: #00cc66;"></i> Matriz Jira NYP-1 a NYP-5 · Motor Real
         </span>
@@ -55,9 +60,15 @@
             @csrf
             <input type="hidden" name="scenario" value="match">
             <button type="submit" class="btn-scenario-trigger btn-match">
-                <span class="scenario-btn-tag" style="background: #dcfce7; color: #15803d;">CP01 / CP05 · Jira NYP-1 / NYP-5</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+                    <span class="scenario-btn-tag" style="background: #dcfce7; color: #15803d; margin: 0;">CP01 / CP05</span>
+                    <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: #f0fdf4; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">PRUEBA 1</span>
+                </div>
                 <div class="scenario-btn-name">Coincidencia Válida & Cobro</div>
-                <div class="scenario-btn-hint">WhatsApp y Push coinciden (S/ 65.00). Liquida recibo y valida idempotencia.</div>
+                <div class="scenario-btn-hint" style="margin-bottom: 12px;">WhatsApp y Push coinciden (S/ 65.00). Liquida recibo y valida idempotencia.</div>
+                <div class="btn-cta-action btn-cta-green">
+                    <i class="fa-solid fa-play"></i> Ejecutar Prueba 1
+                </div>
             </button>
         </form>
 
@@ -66,9 +77,15 @@
             @csrf
             <input type="hidden" name="scenario" value="amount_mismatch">
             <button type="submit" class="btn-scenario-trigger btn-amount">
-                <span class="scenario-btn-tag" style="background: #fef3c7; color: #b45309;">CP02 · Jira NYP-2</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+                    <span class="scenario-btn-tag" style="background: #fef3c7; color: #b45309; margin: 0;">CP02</span>
+                    <span style="font-size: 10.5px; font-weight: 800; color: #d97706; background: #fffbeb; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a;">PRUEBA 2</span>
+                </div>
                 <div class="scenario-btn-name">Monto Discordante</div>
-                <div class="scenario-btn-hint">Cliente declara S/ 64.00 vs receptor S/ 65.00. Rechazo seguro sin cobro.</div>
+                <div class="scenario-btn-hint" style="margin-bottom: 12px;">Cliente declara S/ 64.00 vs receptor S/ 65.00. Rechazo seguro sin cobro.</div>
+                <div class="btn-cta-action btn-cta-amber">
+                    <i class="fa-solid fa-play"></i> Ejecutar Prueba 2
+                </div>
             </button>
         </form>
 
@@ -77,9 +94,15 @@
             @csrf
             <input type="hidden" name="scenario" value="security_mismatch">
             <button type="submit" class="btn-scenario-trigger btn-sec">
-                <span class="scenario-btn-tag" style="background: #fee2e2; color: #b91c1c;">CP03 · Jira NYP-3</span>
-                <div class="scenario-btn-name">Código de Seguridad Alterado</div>
-                <div class="scenario-btn-hint">Dígito OCR (123) ≠ Banco (999). Detección de fraude y estado observado.</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+                    <span class="scenario-btn-tag" style="background: #fee2e2; color: #b91c1c; margin: 0;">CP03</span>
+                    <span style="font-size: 10.5px; font-weight: 800; color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecaca;">PRUEBA 3</span>
+                </div>
+                <div class="scenario-btn-name">Código Alterado (Fraude)</div>
+                <div class="scenario-btn-hint" style="margin-bottom: 12px;">Dígito OCR (123) ≠ Banco (999). Detección de fraude y estado observado.</div>
+                <div class="btn-cta-action btn-cta-red">
+                    <i class="fa-solid fa-play"></i> Ejecutar Prueba 3
+                </div>
             </button>
         </form>
 
@@ -88,9 +111,15 @@
             @csrf
             <input type="hidden" name="scenario" value="missing_receiver">
             <button type="submit" class="btn-scenario-trigger btn-miss">
-                <span class="scenario-btn-tag" style="background: #e0f2fe; color: #0369a1;">CP04 · Jira NYP-4</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+                    <span class="scenario-btn-tag" style="background: #e0f2fe; color: #0369a1; margin: 0;">CP04</span>
+                    <span style="font-size: 10.5px; font-weight: 800; color: #0284c7; background: #f0f9ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #bae6fd;">PRUEBA 4</span>
+                </div>
                 <div class="scenario-btn-name">Sin Notificación Push</div>
-                <div class="scenario-btn-hint">Dispositivo receptor desconectado. Intención en espera transitoria segura.</div>
+                <div class="scenario-btn-hint" style="margin-bottom: 12px;">Dispositivo receptor desconectado. Intención en espera transitoria segura.</div>
+                <div class="btn-cta-action btn-cta-blue">
+                    <i class="fa-solid fa-play"></i> Ejecutar Prueba 4
+                </div>
             </button>
         </form>
     </div>

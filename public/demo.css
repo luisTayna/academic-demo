@@ -894,6 +894,62 @@ table.noretel-table tbody tr:hover td {
     line-height: 1.35;
 }
 
+/* Call to Action Button inside Scenario Cards */
+.btn-cta-action {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: auto;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.btn-cta-green {
+    background: #00cc66;
+    color: white;
+}
+.btn-scenario-trigger:hover .btn-cta-green {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(0, 204, 102, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cta-amber {
+    background: #f59e0b;
+    color: white;
+}
+.btn-scenario-trigger:hover .btn-cta-amber {
+    background: #d97706;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cta-red {
+    background: #ef4444;
+    color: white;
+}
+.btn-scenario-trigger:hover .btn-cta-red {
+    background: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cta-blue {
+    background: #0084ff;
+    color: white;
+}
+.btn-scenario-trigger:hover .btn-cta-blue {
+    background: #0284c7;
+    box-shadow: 0 4px 12px rgba(0, 132, 255, 0.35);
+    transform: translateY(-1px);
+}
+
 /* Technical Trace Accordion */
 .technical-trace-accordion {
     background: #f8fafc;

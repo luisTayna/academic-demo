@@ -55,17 +55,17 @@
     </div>
 
     <div class="scenarios-btn-row">
-        <!-- CP01 / CP05 -->
+        <!-- CP01 -->
         <form method="post" action="/demo/yape" style="display: contents;">
             @csrf
             <input type="hidden" name="scenario" value="match">
             <button type="submit" class="btn-scenario-trigger btn-match">
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
-                    <span class="scenario-btn-tag" style="background: #dcfce7; color: #15803d; margin: 0;">CP01 / CP05</span>
+                    <span class="scenario-btn-tag" style="background: #dcfce7; color: #15803d; margin: 0;">CP01 · NYP-1</span>
                     <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: #f0fdf4; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">PRUEBA 1</span>
                 </div>
-                <div class="scenario-btn-name">Coincidencia Válida & Cobro</div>
-                <div class="scenario-btn-hint" style="margin-bottom: 12px;">WhatsApp y Push coinciden (S/ 65.00). Liquida recibo y valida idempotencia.</div>
+                <div class="scenario-btn-name">Conciliación Válida</div>
+                <div class="scenario-btn-hint" style="margin-bottom: 12px;">Importes y códigos coinciden (S/ 65.00). Liquida recibo y emite pago.</div>
                 <div class="btn-cta-action btn-cta-green">
                     <i class="fa-solid fa-play"></i> Ejecutar Prueba 1
                 </div>
@@ -78,7 +78,7 @@
             <input type="hidden" name="scenario" value="amount_mismatch">
             <button type="submit" class="btn-scenario-trigger btn-amount">
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
-                    <span class="scenario-btn-tag" style="background: #fef3c7; color: #b45309; margin: 0;">CP02</span>
+                    <span class="scenario-btn-tag" style="background: #fef3c7; color: #b45309; margin: 0;">CP02 · NYP-2</span>
                     <span style="font-size: 10.5px; font-weight: 800; color: #d97706; background: #fffbeb; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a;">PRUEBA 2</span>
                 </div>
                 <div class="scenario-btn-name">Monto Discordante</div>
@@ -95,7 +95,7 @@
             <input type="hidden" name="scenario" value="security_mismatch">
             <button type="submit" class="btn-scenario-trigger btn-sec">
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
-                    <span class="scenario-btn-tag" style="background: #fee2e2; color: #b91c1c; margin: 0;">CP03</span>
+                    <span class="scenario-btn-tag" style="background: #fee2e2; color: #b91c1c; margin: 0;">CP03 · NYP-3</span>
                     <span style="font-size: 10.5px; font-weight: 800; color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecaca;">PRUEBA 3</span>
                 </div>
                 <div class="scenario-btn-name">Código Alterado (Fraude)</div>
@@ -112,13 +112,30 @@
             <input type="hidden" name="scenario" value="missing_receiver">
             <button type="submit" class="btn-scenario-trigger btn-miss">
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
-                    <span class="scenario-btn-tag" style="background: #e0f2fe; color: #0369a1; margin: 0;">CP04</span>
+                    <span class="scenario-btn-tag" style="background: #e0f2fe; color: #0369a1; margin: 0;">CP04 · NYP-4</span>
                     <span style="font-size: 10.5px; font-weight: 800; color: #0284c7; background: #f0f9ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #bae6fd;">PRUEBA 4</span>
                 </div>
-                <div class="scenario-btn-name">Sin Notificación Push</div>
+                <div class="scenario-btn-name">Sin Push Receptor</div>
                 <div class="scenario-btn-hint" style="margin-bottom: 12px;">Dispositivo receptor desconectado. Intención en espera transitoria segura.</div>
                 <div class="btn-cta-action btn-cta-blue">
                     <i class="fa-solid fa-play"></i> Ejecutar Prueba 4
+                </div>
+            </button>
+        </form>
+
+        <!-- CP05 -->
+        <form method="post" action="/demo/yape" style="display: contents;">
+            @csrf
+            <input type="hidden" name="scenario" value="idempotency">
+            <button type="submit" class="btn-scenario-trigger btn-idem">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+                    <span class="scenario-btn-tag" style="background: #f3e8ff; color: #7e22ce; margin: 0;">CP05 · NYP-5</span>
+                    <span style="font-size: 10.5px; font-weight: 800; color: #7e22ce; background: #faf5ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #e9d5ff;">PRUEBA 5</span>
+                </div>
+                <div class="scenario-btn-name">Reintento / Idempotencia</div>
+                <div class="scenario-btn-hint" style="margin-bottom: 12px;">Reenvío de intención liquidada. Retorna cobro previo sin duplicar en BD.</div>
+                <div class="btn-cta-action btn-cta-purple">
+                    <i class="fa-solid fa-play"></i> Ejecutar Prueba 5
                 </div>
             </button>
         </form>
@@ -269,6 +286,26 @@
                     <pre class="json-code-box">{{ $t['receiver_payload_json'] }}</pre>
                 </div>
             </div>
+            @if(!empty($t['code_trace']))
+            @php $ct = $t['code_trace']; @endphp
+            <div style="margin-top: 14px; background: #0f172a; border-radius: 12px; padding: 14px 16px; border: 1px solid #1e293b; box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);">
+                <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e293b; padding-bottom: 6px;">
+                    <span><i class="fa-solid fa-code-branch" style="color: #38bdf8; margin-right: 6px;"></i> Pila de Ejecución Backend de Código Fuente (PHP / Laravel)</span>
+                    <span style="font-size: 10px; background: #1e293b; color: #94a3b8; padding: 2px 6px; border-radius: 4px;">CAJA BLANCA</span>
+                </div>
+                <div style="font-family: 'Consolas', 'Courier New', monospace; font-size: 11.5px; color: #cbd5e1; line-height: 1.7;">
+                    <div><span style="color: #64748b;">1. Ruta Web Invocada:</span> <span style="color: #4ade80;">{{ $ct['route'] }}</span></div>
+                    <div><span style="color: #64748b;">2. Orquestador Determinista:</span> <span style="color: #facc15;">{{ $ct['scenario_runner'] }}</span></div>
+                    <div><span style="color: #64748b;">3. Verificación de Aislamiento:</span> <span style="color: #38bdf8;">{{ $ct['isolation_check'] }}</span></div>
+                    <div><span style="color: #64748b;">4. Clase de Dominio:</span> <span style="color: #f472b6; font-weight: bold;">{{ $ct['service_class'] }}</span></div>
+                    <div><span style="color: #64748b;">5. Método Principal Invocado:</span> <strong style="color: #ffffff; background: #1e293b; padding: 1px 5px; border-radius: 3px;">{{ $ct['primary_method'] }}</strong></div>
+                    <div><span style="color: #64748b;">6. Motor de Reglas Ejecutado:</span> <span style="color: #fb923c;">{{ $ct['rules_engine_method'] }}</span></div>
+                    <div><span style="color: #64748b;">7. Rama de Decisión de Código:</span> <strong style="color: #22d3ee;">{{ $ct['executed_code_branch'] }}</strong></div>
+                    <div><span style="color: #64748b;">8. Persistencia y Transacción:</span> <span style="color: #a78bfa;">{{ $ct['database_transaction'] }}</span></div>
+                </div>
+            </div>
+            @endif
+
             <div style="margin-top: 12px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11.5px; color: #64748b; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-circle-check" style="color: #00cc66;"></i>
                 <div>

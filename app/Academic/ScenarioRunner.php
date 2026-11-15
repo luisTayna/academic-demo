@@ -9,13 +9,30 @@ use Modules\Billing\Services\YapeReconciliationService;
 
 final class ScenarioRunner
 {
-    public const SCENARIOS = ['match' => 1, 'amount_mismatch' => 2, 'security_mismatch' => 3, 'missing_receiver' => 4];
+    public const SCENARIOS = [
+        'match' => 1,
+        'amount_mismatch' => 2,
+        'security_mismatch' => 3,
+        'missing_receiver' => 4,
+        'idempotency' => 1,
+    ];
     public function __construct(private YapeReconciliationService $reconciliation) {}
 
     public function run(string $scenario): YapePaymentIntent
     {
         IsolationGuard::assertDatabase(base_path(), config('database.default'), config('database.connections.sqlite.database'), config('app.env'));
         if (!isset(self::SCENARIOS[$scenario])) { throw new \InvalidArgumentException('Escenario desconocido.'); }
+
+        if ($scenario === 'idempotency') {
+            $intent = YapePaymentIntent::where('intent_number', 'DEMO-YAPE-1')->first();
+            if (!$intent || $intent->status !== YapePaymentIntent::STATUS_VALIDATED) {
+                $this->run('match');
+                $intent = YapePaymentIntent::where('intent_number', 'DEMO-YAPE-1')->first();
+            }
+            // Re-execute reconciliation on already validated intent to test idempotency
+            return $this->reconciliation->tryReconcile($intent->fresh());
+        }
+
         return DB::transaction(function () use ($scenario) {
             $id = self::SCENARIOS[$scenario];
             $intent = YapePaymentIntent::where('intent_number', 'DEMO-YAPE-'.$id)->first();

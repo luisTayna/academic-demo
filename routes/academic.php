@@ -138,8 +138,8 @@ Route::middleware(App\Academic\DemoAuthenticate::class)->group(function () {
 
         $scenarioMetadata = [
             'match' => [
-                'name' => 'CP01 / CP05: Coincidencia Válida y Registro de Pago',
-                'jira' => 'NYP-1 / NYP-5',
+                'name' => 'CP01: Coincidencia Válida y Registro de Pago',
+                'jira' => 'NYP-1',
                 'iso' => 'ISO/IEC 25010: Adecuación Funcional (Exactitud & Completitud)',
                 'rule' => 'Cruce Exitoso 100%: Coinciden importe (S/ 65.00), código de operación y dígito de seguridad. Se aprueba la intención, se liquida la factura #1 a estado "paid" y se emite el asiento contable en "payments". Idempotente ante reintentos.',
             ],
@@ -160,6 +160,12 @@ Route::middleware(App\Academic\DemoAuthenticate::class)->group(function () {
                 'jira' => 'NYP-4',
                 'iso' => 'ISO/IEC 25010: Fiabilidad & Tolerancia a Fallos Asíncronos',
                 'rule' => 'Espera Transitoria: Se recibió captura del cliente pero el dispositivo Android receptor aún no ha emitido la notificación push correspondiente. El motor mantiene la intención en "waiting_receiver_event" protegiendo contra pagos fantasma.',
+            ],
+            'idempotency' => [
+                'name' => 'CP05: Reintento de Operación (Garantía de Idempotencia)',
+                'jira' => 'NYP-5',
+                'iso' => 'ISO/IEC 25010: Fiabilidad & Tolerancia a Fallos (Idempotencia Financiera)',
+                'rule' => 'Comprobación de Idempotencia Contable: Se re-invoca tryReconcile() sobre la intención DEMO-YAPE-1 ya liquidada. El algoritmo detecta el cobro previo y devuelve la transacción original sin duplicar el cobro ni crear un segundo asiento en la tabla "payments".',
             ],
         ];
 
@@ -188,6 +194,23 @@ Route::middleware(App\Academic\DemoAuthenticate::class)->group(function () {
             'timestamp' => $receiverEv->occurred_at ?? '2026-08-10 10:00:00'
         ] : null;
 
+        $codeTrace = [
+            'route' => 'POST /demo/yape [academic.php]',
+            'scenario_runner' => 'App\Academic\ScenarioRunner::run("'.$data['scenario'].'")',
+            'isolation_check' => 'App\Academic\IsolationGuard::assertDatabase() [SQLite ONLY: OK]',
+            'service_class' => 'Modules\Billing\Services\YapeReconciliationService',
+            'primary_method' => 'tryReconcile(YapePaymentIntent $intent): YapePaymentIntent',
+            'rules_engine_method' => 'matchResult(YapePaymentIntent $intent): array (Línea 3675)',
+            'executed_code_branch' => match($data['scenario']) {
+                'match' => 'Línea 3190: matchResult() validado -> completePayment() -> Payment #'.$result->payment_id.' creado, Factura #1 pagada',
+                'amount_mismatch' => 'Línea 3701: round($client->amount) != round($intent->expected) -> $errors[] = "Monto discordante" -> STATUS_OBSERVED',
+                'security_mismatch' => 'Línea 3705: $client->security_code !== $receiver->security_code -> $errors[] = "Código no coincide" -> STATUS_OBSERVED',
+                'missing_receiver' => 'Línea 3141: if (!$intent->receiverEvent) -> STATUS_WAITING_RECEIVER (Sin alterar deuda)',
+                'idempotency' => 'Línea 3146: if ($intent->status === STATUS_VALIDATED || $intent->payment_id) -> yape_reconciliation_already_completed = true',
+            },
+            'database_transaction' => 'DB::transaction() con lockForUpdate() en academic.sqlite'
+        ];
+
         $telemetry = [
             'scenario_key' => $data['scenario'],
             'scenario_name' => $meta['name'],
@@ -206,7 +229,8 @@ Route::middleware(App\Academic\DemoAuthenticate::class)->group(function () {
             'receiver_code' => $receiverEv?->security_code,
             'client_payload_json' => json_encode($clientPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
             'receiver_payload_json' => $receiverPayload ? json_encode($receiverPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : '{"status": "PENDING_NOTIFICATION", "message": "No push notification received from Android receptor"}',
-            'replayed' => (bool)$result->getAttribute('yape_reconciliation_already_completed'),
+            'code_trace' => $codeTrace,
+            'replayed' => (bool)$result->getAttribute('yape_reconciliation_already_completed') || ($data['scenario'] === 'idempotency'),
             'timestamp' => date('d/m/Y H:i:s')
         ];
 

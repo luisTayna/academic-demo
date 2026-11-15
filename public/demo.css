@@ -836,7 +836,7 @@ table.noretel-table tbody tr:hover td {
 
 .scenarios-btn-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
 }
 
@@ -871,6 +871,9 @@ table.noretel-table tbody tr:hover td {
 
 .btn-scenario-trigger.btn-miss { border-color: #bae6fd; }
 .btn-scenario-trigger.btn-miss:hover { border-color: #0084ff; box-shadow: 0 6px 16px rgba(0, 132, 255, 0.15); }
+
+.btn-scenario-trigger.btn-idem { border-color: #e9d5ff; }
+.btn-scenario-trigger.btn-idem:hover { border-color: #a855f7; box-shadow: 0 6px 16px rgba(168, 85, 247, 0.15); }
 
 .scenario-btn-tag {
     font-size: 10px;
@@ -947,6 +950,16 @@ table.noretel-table tbody tr:hover td {
 .btn-scenario-trigger:hover .btn-cta-blue {
     background: #0284c7;
     box-shadow: 0 4px 12px rgba(0, 132, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cta-purple {
+    background: #9333ea;
+    color: white;
+}
+.btn-scenario-trigger:hover .btn-cta-purple {
+    background: #7e22ce;
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.35);
     transform: translateY(-1px);
 }
 

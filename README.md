@@ -28,23 +28,29 @@ El prototipo está diseñado como un entorno aislado, autocontenido y completame
 
 ---
 
-## 3. Inicio Rápido en 3 Pasos
+## 3. Guía de Ejecución Rápida para el Evaluador
 
-Abra una terminal en la raíz de esta carpeta (`academic-demo`):
+Abra una terminal y ejecute los siguientes comandos en orden:
 
-### Paso 1: Instalar dependencias
+### Paso 1: Clonar el repositorio e ingresar a la carpeta del proyecto
+```bash
+git clone https://github.com/luisTayna/academic-demo.git
+cd academic-demo
+```
+
+### Paso 2: Instalar dependencias del proyecto
 ```bash
 composer install --no-scripts --no-plugins
 ```
 
-### Paso 2: Inicializar la base de datos de pruebas sintéticas
+### Paso 3: Inicializar la base de datos de pruebas sintéticas (SQLite)
 ```bash
 php artisan demo:setup
 php artisan demo:verify
 ```
 *Este comando migra el esquema SQLite y precarga 4 clientes ficticios y 4 facturas independientes de S/ 65.00.*
 
-### Paso 3: Ejecutar la batería de pruebas PHPUnit
+### Paso 4: Ejecutar la batería de pruebas automatizadas (PHPUnit)
 ```bash
 php vendor/phpunit/phpunit/phpunit --configuration phpunit.xml --filter AcademicDemo
 ```

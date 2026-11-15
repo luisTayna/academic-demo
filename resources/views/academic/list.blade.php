@@ -1,0 +1,4 @@
+@extends('academic.layout')
+@section('content')
+<p class="eyebrow">REGISTROS FICTICIOS · SOLO LECTURA</p><h1>{{ $title }}</h1><div class="panel"><table><thead><tr>@foreach($columns as $column)<th>{{ ['id'=>'ID','first_name'=>'Nombre','last_name'=>'Apellido','identity_document'=>'Documento ficticio','email'=>'Correo ficticio','customer_id'=>'Cliente','start_date'=>'Inicio','status'=>'Estado','final_price'=>'Precio','invoice_number'=>'Recibo','contract_id'=>'Contrato','total_amount'=>'Total','invoice_id'=>'Recibo','amount'=>'Importe','payment_method'=>'Método'][$column] ?? $column }}</th>@endforeach</tr></thead><tbody>@forelse($records as $record)<tr>@foreach($columns as $column)<td>{{ $record->$column }}</td>@endforeach</tr>@empty<tr><td colspan="{{ count($columns) }}">No hay registros. Ejecute un escenario válido para generar un pago ficticio.</td></tr>@endforelse</tbody></table></div>
+@endsection

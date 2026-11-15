@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+require __DIR__.'/bootstrap/safety.php';
+$command = $argv[1] ?? 'list';
+if (!in_array($command, ['demo:setup', 'demo:verify', 'list', 'help'], true)) {
+    fwrite(STDERR, "Comando operativo bloqueado.\n");
+    exit(2);
+}
+if ($command === 'demo:setup' && !file_exists(__DIR__.'/.env')) {
+    $template = file_get_contents(__DIR__.'/.env.example');
+    file_put_contents(__DIR__.'/.env', str_replace('GENERATED_BY_DEMO_SETUP', 'base64:'.base64_encode(random_bytes(32)), $template), LOCK_EX);
+}
+require __DIR__.'/vendor/autoload.php';
+$app = require __DIR__.'/bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$input = new Symfony\Component\Console\Input\ArgvInput();
+$status = $kernel->handle($input, new Symfony\Component\Console\Output\ConsoleOutput());
+$kernel->terminate($input, $status);
+exit($status);

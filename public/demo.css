@@ -952,42 +952,140 @@ table.noretel-table tbody tr:hover td {
 
 /* Technical Trace Accordion */
 .technical-trace-accordion {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    background: #ffffff;
+    border: 1.5px solid #bae6fd;
+    border-radius: 14px;
     overflow: hidden;
+    margin-top: 16px;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08);
+    transition: all 0.25s ease;
+}
+
+.technical-trace-accordion:hover {
+    border-color: #0284c7;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.14);
+    transform: translateY(-1px);
+}
+
+.technical-trace-accordion[open] {
+    border-color: #0084ff;
+    box-shadow: 0 8px 25px rgba(0, 132, 255, 0.15);
 }
 
 .technical-trace-summary {
-    padding: 10px 14px;
+    padding: 12px 18px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    color: #334155;
+    background: linear-gradient(90deg, #f0f9ff 0%, #f8fafc 100%);
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 12px;
     user-select: none;
+    transition: background 0.2s ease;
 }
 
 .technical-trace-summary:hover {
-    background: #f1f5f9;
+    background: linear-gradient(90deg, #e0f2fe 0%, #f1f5f9 100%);
 }
 
-.technical-trace-summary .trace-arrow {
-    margin-left: auto;
+.trace-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.trace-icon-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #e0f2fe;
+    color: #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.technical-trace-accordion:hover .trace-icon-circle {
+    background: #0284c7;
+    color: white;
+}
+
+.trace-title-text {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.trace-subtitle-text {
+    font-size: 11.5px;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.trace-tag-pill {
+    background: #e0f2fe;
+    color: #0369a1;
     font-size: 10px;
-    color: #94a3b8;
-    transition: transform 0.2s ease;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    border: 1px solid #bae6fd;
 }
 
-.technical-trace-accordion[open] .technical-trace-summary .trace-arrow {
+.trace-cta-btn {
+    background: white;
+    border: 1.5px solid #0284c7;
+    color: #0284c7;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.12);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.technical-trace-accordion:hover .trace-cta-btn {
+    background: #0284c7;
+    color: white;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.technical-trace-accordion[open] .trace-cta-btn {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: white;
+}
+
+.trace-cta-btn .trace-arrow {
+    transition: transform 0.25s ease;
+    font-size: 10px;
+}
+
+.technical-trace-accordion[open] .trace-cta-btn .trace-arrow {
     transform: rotate(180deg);
 }
 
+.technical-trace-accordion[open] .trace-cta-btn .text-closed {
+    display: none;
+}
+
+.technical-trace-accordion:not([open]) .trace-cta-btn .text-open {
+    display: none;
+}
+
 .technical-trace-content {
-    padding: 12px 14px 16px;
-    border-top: 1px solid #e2e8f0;
+    padding: 14px 18px 18px;
+    border-top: 1px solid #e0f2fe;
     background: white;
 }
 

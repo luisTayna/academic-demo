@@ -231,29 +231,49 @@
     @endif
 
     <!-- Collapsible Technical Trace Section -->
-    <details class="technical-trace-accordion" style="margin-top: 14px;">
+    <details class="technical-trace-accordion">
         <summary class="technical-trace-summary">
-            <i class="fa-solid fa-code" style="color: #0084ff;"></i>
-            <span>Ver Trazas Técnicas y Payloads Asíncronos (OpenWA OCR & Android Push)</span>
-            <i class="fa-solid fa-chevron-down trace-arrow"></i>
+            <div class="trace-summary-left">
+                <div class="trace-icon-circle">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span class="trace-title-text">Inspección Forense de Trazas Asíncronas</span>
+                        <span class="trace-tag-pill"><i class="fa-solid fa-terminal"></i> JSON RAW</span>
+                    </div>
+                    <div class="trace-subtitle-text">Ver payloads simulados del Webhook OpenWA (OCR) y Android NotificationListener</div>
+                </div>
+            </div>
+            <div class="trace-cta-btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span class="text-closed">Inspeccionar Trazas JSON</span>
+                <span class="text-open">Ocultar Trazas</span>
+                <i class="fa-solid fa-chevron-down trace-arrow"></i>
+            </div>
         </summary>
         <div class="technical-trace-content">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
                 <div>
-                    <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> Webhook OpenWA (Extracción OCR)
+                    <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-brands fa-whatsapp" style="color: #25d366; margin-right: 4px;"></i> Webhook OpenWA (Extracción OCR)</span>
+                        <span style="font-size: 10px; background: #dcfce7; color: #15803d; padding: 1px 6px; border-radius: 4px;">Evidencia Cliente</span>
                     </div>
                     <pre class="json-code-box">{{ $t['client_payload_json'] }}</pre>
                 </div>
                 <div>
-                    <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-brands fa-android" style="color: #3ddc84;"></i> Android Push Notification Listener
+                    <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-brands fa-android" style="color: #3ddc84; margin-right: 4px;"></i> Android Notification Listener</span>
+                        <span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 1px 6px; border-radius: 4px;">Evento Push Banco</span>
                     </div>
                     <pre class="json-code-box">{{ $t['receiver_payload_json'] }}</pre>
                 </div>
             </div>
-            <div style="margin-top: 10px; font-size: 11px; color: #64748b;">
-                <strong>Aislamiento Garantizado:</strong> Simulación determinista ejecutada sobre <code>ScenarioRunner.php</code> llamando al algoritmo de producción sin librerías externas ni credenciales reales.
+            <div style="margin-top: 12px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11.5px; color: #64748b; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-circle-check" style="color: #00cc66;"></i>
+                <div>
+                    <strong>Aislamiento Determinista:</strong> El motor de conciliación procesó estos eventos mediante <code>ScenarioRunner.php</code> llamando al código real de producción sin dependencias externas.
+                </div>
             </div>
         </div>
     </details>

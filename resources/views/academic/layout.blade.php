@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NoreTEL CRM · Suite de Pruebas y Conciliación Yape</title>
+    <title>NorETEL CRM · Suite de Pruebas y Conciliación Yape</title>
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 6 Icons -->
@@ -11,91 +11,117 @@
     <link rel="stylesheet" href="/demo.css">
 </head>
 <body>
-    <header class="app-header">
-        <div class="brand-container">
-            <div class="logo-box">N</div>
-            <div class="brand-text">
-                <strong>NoreTEL CRM</strong>
-                <span>Módulo de Facturación & QA</span>
+    <div class="crm-wrapper">
+        <!-- Sidebar NoreTel Next-Gen -->
+        <aside id="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-initial">N</div>
+                <div class="sidebar-brand-text">NorETEL CRM</div>
             </div>
-        </div>
-        <div class="header-badges">
-            <div class="env-pill">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span>Entorno Académico Aislado (PA2) · Datos ficticios</span>
-            </div>
-            @auth
-            <div class="user-pill">
-                <i class="fa-solid fa-user-circle"></i>
-                <span>Evaluador: Yhon Mamani Kjuro</span>
-            </div>
-            @endauth
-        </div>
-    </header>
 
-    <div class="app-layout">
-        <aside class="sidebar">
-            <div class="sidebar-title">MENÚ PRINCIPAL</div>
-            <nav class="nav-menu">
-                <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span>Resumen</span>
-                </a>
-                <a href="/customers" class="{{ request()->is('customers') ? 'active' : '' }}">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Clientes</span>
-                </a>
-                <a href="/contracts" class="{{ request()->is('contracts') ? 'active' : '' }}">
-                    <i class="fa-solid fa-file-contract"></i>
-                    <span>Contratos</span>
-                </a>
-                <a href="/invoices" class="{{ request()->is('invoices') ? 'active' : '' }}">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>Recibos</span>
-                </a>
-                <a href="/payments" class="{{ request()->is('payments') ? 'active' : '' }}">
-                    <i class="fa-solid fa-money-bill-wave"></i>
-                    <span>Pagos</span>
-                </a>
-                <a href="/demo/yape" class="yape-link {{ request()->is('demo/yape*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                    <span>Simulación Yape</span>
-                    <span class="pulse-badge">QA</span>
-                </a>
-            </nav>
+            <div class="sidebar-nav-container">
+                <div class="sidebar-heading">OPERACIONES</div>
+                <div class="nav-item">
+                    <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-heading">CLIENTES</div>
+                <div class="nav-item">
+                    <a href="/customers" class="nav-link {{ request()->is('customers') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Gestión de Clientes</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/contracts" class="nav-link {{ request()->is('contracts') ? 'active' : '' }}">
+                        <i class="fa-solid fa-file-contract"></i>
+                        <span>Gestión de Contratos</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-heading">FACTURACIÓN & COBROS</div>
+                <div class="nav-item">
+                    <a href="/invoices" class="nav-link {{ request()->is('invoices') ? 'active' : '' }}">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Recibos de Clientes</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/payments" class="nav-link {{ request()->is('payments') ? 'active' : '' }}">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <span>Cuaderno de Pagos</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/demo/yape" class="nav-link yape-highlight {{ request()->is('demo/yape*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span>Historial Yape</span>
+                        <span class="yape-pill">QA</span>
+                    </a>
+                </div>
+            </div>
 
             @auth
             <div class="sidebar-footer">
                 <form method="post" action="/logout">
                     @csrf
-                    <button class="logout-btn">
+                    <button class="btn-logout" title="Cerrar Sesión">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span>Cerrar Sesión</span>
+                        <span>Salir</span>
                     </button>
                 </form>
             </div>
             @endauth
         </aside>
 
-        <main class="main-content">
-            @if(session('result'))
-            <div class="alert-box success">
-                <i class="fa-solid fa-circle-check"></i>
-                <div>
-                    <strong>Resultado del Escenario:</strong> {{ session('result') }}
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <div class="academic-badge">
+                        <i class="fa-solid fa-flask-vial"></i>
+                        <span>Entorno Académico PA2 · Datos ficticios</span>
+                    </div>
                 </div>
-            </div>
-            @endif
+                <div class="topbar-right">
+                    <button class="topbar-icon-btn" title="Notificaciones">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    @auth
+                    <div class="user-profile-badge">
+                        <div class="user-avatar">YM</div>
+                        <span class="user-name">Yhon Mamani (QA)</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: #94a3b8;"></i>
+                    </div>
+                    @endauth
+                </div>
+            </header>
 
-            @if($errors->any())
-            <div class="alert-box error">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <div>{{ $errors->first() }}</div>
-            </div>
-            @endif
+            <!-- Main Page Content -->
+            <main class="page-content">
+                @if(session('result'))
+                <div class="alert-box-crm success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong>Ejecución Registrada:</strong> {{ session('result') }}
+                    </div>
+                </div>
+                @endif
 
-            @yield('content')
-        </main>
+                @if($errors->any())
+                <div class="alert-box-crm error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>{{ $errors->first() }}</div>
+                </div>
+                @endif
+
+                @yield('content')
+            </main>
+        </div>
     </div>
 </body>
 </html>

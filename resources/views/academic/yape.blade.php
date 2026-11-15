@@ -1,119 +1,441 @@
 @extends('academic.layout')
 
 @section('content')
-<div class="page-header">
-    <p class="eyebrow">ENTRADAS SINTÉTICAS · ALGORITMO REAL</p>
-    <h1>Laboratorio de Simulación: Conciliación Yape</h1>
-    <p class="subtitle">Dispare interactivamente los escenarios de prueba funcionales. El sistema ejecuta el servicio real <code>YapeReconciliationService</code> para contrastar la evidencia reportada por el cliente frente al evento del receptor.</p>
-</div>
-
-@php
-    $scenario_meta = [
-        'match' => [
-            'title' => 'Conciliación Válida',
-            'class' => 'match',
-            'badge' => 'CP01 / CP05 (Éxito)',
-            'badge_class' => 'badge-cp1',
-            'desc' => 'Cliente y receptor coinciden exactamente en S/ 65.00 y código de seguridad. Resultado: Intención validada, pago registrado y factura marcada como pagada. La re-ejecución demuestra idempotencia.'
-        ],
-        'amount_mismatch' => [
-            'title' => 'Discrepancia en Importe',
-            'class' => 'amount_mismatch',
-            'badge' => 'CP02 (Negativo)',
-            'badge_class' => 'badge-cp2',
-            'desc' => 'El cliente reporta S/ 65.00 pero el receptor notifica abono real de S/ 50.00. Resultado: Intención observada, sin registro de pago y factura permanece pendiente.'
-        ],
-        'security_mismatch' => [
-            'title' => 'Código de Operación Inválido',
-            'class' => 'security_mismatch',
-            'badge' => 'CP03 (Rechazo Seguro)',
-            'badge_class' => 'badge-cp3',
-            'desc' => 'Montos coinciden en S/ 65.00 pero los códigos de seguridad difieren (posible comprobante manipulado). Resultado: Intención observada sin efecto económico.'
-        ],
-        'missing_receiver' => [
-            'title' => 'Falta de Notificación Bancaria',
-            'class' => 'missing_receiver',
-            'badge' => 'CP04 (Espera Asíncrona)',
-            'badge_class' => 'badge-cp4',
-            'desc' => 'Cliente sube captura pero la notificación push del banco aún no llega al servidor. Resultado: Estado "waiting_receiver_event" a la espera de conciliación.'
-        ],
-    ];
-@endphp
-
-<div class="scenario-grid">
-    @foreach($scenarios as $scenario => $invoice)
-    <form method="post" action="/demo/yape" class="scenario-card {{ $scenario_meta[$scenario]['class'] }}">
-        @csrf
-        <input type="hidden" name="scenario" value="{{ $scenario }}">
+<!-- Header matching Image 4 -->
+<div class="page-title-row">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-mobile-screen-button" style="color: #00cc66; font-size: 22px;"></i>
         <div>
-            <div class="scenario-header">
-                <h3>{{ $scenario_meta[$scenario]['title'] }}</h3>
-                <span class="scenario-badge {{ $scenario_meta[$scenario]['badge_class'] }}">
-                    {{ $scenario_meta[$scenario]['badge'] }}
-                </span>
-            </div>
-            <div class="scenario-invoice">
-                <i class="fa-solid fa-receipt"></i> Recibo Ficticio #{{ $invoice }} · Importe S/ 65.00
-            </div>
-            <p class="scenario-desc">{{ $scenario_meta[$scenario]['desc'] }}</p>
+            <h1 style="margin: 0; font-size: 24px;">Validaciones Yape</h1>
         </div>
-        <button class="btn-primary" style="align-self: flex-start;">
-            <i class="fa-solid fa-bolt"></i>
-            <span>Ejecutar Escenario</span>
+    </div>
+    <div class="page-actions-row">
+        <button class="btn-crm-blue">
+            <i class="fa-solid fa-plus"></i>
+            <span>+ Nuevo cobro</span>
         </button>
-    </form>
-    @endforeach
+    </div>
 </div>
 
-<section class="panel">
-    <h2><i class="fa-solid fa-table-list" style="color: #0099ff; margin-right: 8px;"></i> Registro Histórico de Intenciones Conciliadas</h2>
+<!-- Filter Bar matching Image 4 -->
+<div class="filter-row">
+    <input type="text" class="filter-input" placeholder="Buscar: Intent, operación, cliente, WhatsApp o recibo" style="max-width: 480px;">
+    <select class="filter-select" style="min-width: 160px;"><option>Estado: Todos</option></select>
+    <button class="topbar-icon-btn" style="width: 34px; height: 34px;" title="Buscar">
+        <i class="fa-solid fa-magnifying-glass" style="font-size: 12px;"></i>
+    </button>
+    <button class="topbar-icon-btn" style="width: 34px; height: 34px;" title="Limpiar">
+        <i class="fa-solid fa-xmark" style="font-size: 12px;"></i>
+    </button>
+</div>
+
+<!-- Cyan Info Banner matching Image 4 -->
+<div class="info-banner-yape">
+    <i class="fa-solid fa-circle-info"></i>
+    <div>
+        <strong>Validación Asíncrona Automática:</strong> Aquí NO se sube captura manual. El intent se valida cruzando la captura recibida por WhatsApp/OpenWA con la notificación del Yape receptor en Android.
+    </div>
+</div>
+
+<!-- QA Scenario Triggers Bar (The 4 Test Buttons) -->
+<div class="qa-scenarios-bar">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-vial-circle-check" style="color: #0084ff;"></i>
+            <span>Batería de Pruebas Funcionales Automatizadas (Rúbrica PA2)</span>
+        </h3>
+        <span style="font-size: 11.5px; background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-weight: 600;">
+            <i class="fa-solid fa-code-branch" style="color: #00cc66;"></i> Matriz Jira NYP-1 a NYP-5 · Motor Real
+        </span>
+    </div>
+
+    <div class="scenarios-btn-row">
+        <!-- CP01 / CP05 -->
+        <form method="post" action="/demo/yape" style="display: contents;">
+            @csrf
+            <input type="hidden" name="scenario" value="match">
+            <button type="submit" class="btn-scenario-trigger btn-match">
+                <span class="scenario-btn-tag" style="background: #dcfce7; color: #15803d;">CP01 / CP05 · Jira NYP-1 / NYP-5</span>
+                <div class="scenario-btn-name">Coincidencia Válida & Cobro</div>
+                <div class="scenario-btn-hint">WhatsApp y Push coinciden (S/ 65.00). Liquida recibo y valida idempotencia.</div>
+            </button>
+        </form>
+
+        <!-- CP02 -->
+        <form method="post" action="/demo/yape" style="display: contents;">
+            @csrf
+            <input type="hidden" name="scenario" value="amount_mismatch">
+            <button type="submit" class="btn-scenario-trigger btn-amount">
+                <span class="scenario-btn-tag" style="background: #fef3c7; color: #b45309;">CP02 · Jira NYP-2</span>
+                <div class="scenario-btn-name">Monto Discordante</div>
+                <div class="scenario-btn-hint">Cliente declara S/ 64.00 vs receptor S/ 65.00. Rechazo seguro sin cobro.</div>
+            </button>
+        </form>
+
+        <!-- CP03 -->
+        <form method="post" action="/demo/yape" style="display: contents;">
+            @csrf
+            <input type="hidden" name="scenario" value="security_mismatch">
+            <button type="submit" class="btn-scenario-trigger btn-sec">
+                <span class="scenario-btn-tag" style="background: #fee2e2; color: #b91c1c;">CP03 · Jira NYP-3</span>
+                <div class="scenario-btn-name">Código de Seguridad Alterado</div>
+                <div class="scenario-btn-hint">Dígito OCR (123) ≠ Banco (999). Detección de fraude y estado observado.</div>
+            </button>
+        </form>
+
+        <!-- CP04 -->
+        <form method="post" action="/demo/yape" style="display: contents;">
+            @csrf
+            <input type="hidden" name="scenario" value="missing_receiver">
+            <button type="submit" class="btn-scenario-trigger btn-miss">
+                <span class="scenario-btn-tag" style="background: #e0f2fe; color: #0369a1;">CP04 · Jira NYP-4</span>
+                <div class="scenario-btn-name">Sin Notificación Push</div>
+                <div class="scenario-btn-hint">Dispositivo receptor desconectado. Intención en espera transitoria segura.</div>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Telemetry Result Card (Shown after clicking any test button) -->
+@if(session('telemetry'))
+@php $t = session('telemetry'); @endphp
+<div class="telemetry-card">
+    <div class="telemetry-header">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="background: #0f172a; color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;">
+                    {{ $t['jira_ticket'] ?? 'QA-CASE' }}
+                </span>
+                <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">
+                    {{ $t['scenario_name'] }}
+                </h3>
+            </div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 3px; font-weight: 500;">
+                <i class="fa-solid fa-award" style="color: #0084ff; margin-right: 4px;"></i> {{ $t['iso_category'] ?? 'ISO/IEC 25010' }}
+            </div>
+        </div>
+        <span style="font-size: 11px; color: #64748b; font-weight: 600; white-space: nowrap;">
+            <i class="fa-regular fa-clock"></i> {{ $t['timestamp'] }}
+        </span>
+    </div>
+
+    <!-- Rule Explanation Banner -->
+    <div style="padding: 10px 14px; background: #f8fafc; border-left: 3px solid #0084ff; border-radius: 6px; margin: 12px 0 16px; font-size: 12px; color: #334155; line-height: 1.5;">
+        <strong>Evaluación del Criterio Algorítmico:</strong> {{ $t['rule_explanation'] ?? 'Procesamiento de conciliación asíncrona completado.' }}
+    </div>
+
+    <div class="telemetry-grid">
+        <!-- Box 1: Evidencias Cruzadas -->
+        <div class="telemetry-box">
+            <div class="telemetry-box-title">1. Cruce de Evidencias Asíncronas</div>
+            <div style="font-size: 12px; line-height: 1.6; color: #334155;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 3px;">
+                    <span><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> WhatsApp (Cliente):</span>
+                    <strong>S/ {{ number_format((float)$t['client_amount'], 2) }}</strong>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">Dígito Seg: <strong>{{ $t['client_code'] }}</strong></div>
+
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 3px; margin-top: 4px;">
+                    <span><i class="fa-brands fa-android" style="color: #3ddc84;"></i> Receptor Android:</span>
+                    @if($t['receiver_amount'])
+                        <strong>S/ {{ number_format((float)$t['receiver_amount'], 2) }}</strong>
+                    @else
+                        <span style="color: #ef4444; font-weight: 700;">No Notificado</span>
+                    @endif
+                </div>
+                <div style="font-size: 11px; color: #64748b;">Dígito Seg: <strong>{{ $t['receiver_code'] ?? 'N/A' }}</strong></div>
+            </div>
+        </div>
+
+        <!-- Box 2: Decisión Algorítmica -->
+        <div class="telemetry-box">
+            <div class="telemetry-box-title">2. Veredicto del Motor (YapeReconciliationService)</div>
+            <div class="telemetry-box-value" style="margin: 6px 0;">
+                @if($t['status'] === 'validated')
+                    <span class="pill-status-paid" style="font-size: 13px; padding: 4px 10px;">✔ VALIDADO (Aprobado)</span>
+                @elseif($t['status'] === 'observed')
+                    <span class="pill-status-observed" style="font-size: 13px; padding: 4px 10px;">✖ OBSERVADO (Rechazo Seguro)</span>
+                @else
+                    <span class="pill-status-waiting" style="font-size: 13px; padding: 4px 10px;">⏳ EN ESPERA (Push Pendiente)</span>
+                @endif
+            </div>
+            @if($t['observed_reason'])
+            <div style="font-size: 11px; color: #ef4444; font-weight: 600; margin-top: 4px;">
+                Causal: <code>{{ $t['observed_reason'] }}</code>
+            </div>
+            @else
+            <div style="font-size: 11px; color: #059669; font-weight: 600; margin-top: 4px;">
+                Criterio: Cero discrepancias
+            </div>
+            @endif
+        </div>
+
+        <!-- Box 3: Efecto Contable en Base de Datos -->
+        <div class="telemetry-box">
+            <div class="telemetry-box-title">3. Estado de Persistencia (SQLite)</div>
+            <div style="font-size: 12px; line-height: 1.6; color: #334155;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 3px;">
+                    <span>Factura #{{ $t['invoice_id'] }}:</span>
+                    <strong style="text-transform: uppercase; color: {{ $t['invoice_status'] === 'paid' ? '#059669' : '#d97706' }};">
+                        {{ $t['invoice_status'] === 'paid' ? '✔ PAGADA' : '⏳ PENDIENTE' }}
+                    </strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 4px;">
+                    <span>Asiento en Tabla Payments:</span>
+                    @if($t['payment_id'])
+                        <strong style="color: #059669;">Pago #{{ $t['payment_id'] }} Creado</strong>
+                    @else
+                        <span style="color: #64748b;">Ninguno (Sin cobro erróneo)</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if($t['replayed'])
+    <div style="margin-top: 12px; padding: 10px 14px; background: #ecfdf5; border-radius: 10px; border: 1px solid #a7f3d0; color: #065f46; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-shield-check" style="font-size: 16px; color: #059669;"></i>
+        <div>
+            <strong>Garantía de Idempotencia Verificada (CP05 / NYP-5):</strong> La intención ya había sido validada. El motor retornó la transacción original sin duplicar el cobro ni generar un nuevo registro en <code>payments</code>.
+        </div>
+    </div>
+    @endif
+
+    <!-- Collapsible Technical Trace Section -->
+    <details class="technical-trace-accordion" style="margin-top: 14px;">
+        <summary class="technical-trace-summary">
+            <i class="fa-solid fa-code" style="color: #0084ff;"></i>
+            <span>Ver Trazas Técnicas y Payloads Asíncronos (OpenWA OCR & Android Push)</span>
+            <i class="fa-solid fa-chevron-down trace-arrow"></i>
+        </summary>
+        <div class="technical-trace-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                <div>
+                    <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i> Webhook OpenWA (Extracción OCR)
+                    </div>
+                    <pre class="json-code-box">{{ $t['client_payload_json'] }}</pre>
+                </div>
+                <div>
+                    <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-brands fa-android" style="color: #3ddc84;"></i> Android Push Notification Listener
+                    </div>
+                    <pre class="json-code-box">{{ $t['receiver_payload_json'] }}</pre>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 11px; color: #64748b;">
+                <strong>Aislamiento Garantizado:</strong> Simulación determinista ejecutada sobre <code>ScenarioRunner.php</code> llamando al algoritmo de producción sin librerías externas ni credenciales reales.
+            </div>
+        </div>
+    </details>
+</div>
+@endif
+
+<!-- Validaciones Yape Table matching Image 4 -->
+<div class="crm-table-card">
+    <div class="table-title-row">
+        <h3>Historial de Intenciones Conciliadas</h3>
+    </div>
     <div class="table-container">
-        <table>
+        <table class="noretel-table">
             <thead>
                 <tr>
-                    <th>Intención</th>
-                    <th>Recibo</th>
-                    <th>Estado de Dominio</th>
-                    <th>ID de Pago</th>
-                    <th>Motivo de Observación</th>
+                    <th>INTENT</th>
+                    <th>CLIENTE</th>
+                    <th>RECIBO</th>
+                    <th>MONTO</th>
+                    <th>OPERACIÓN</th>
+                    <th>ESTADO</th>
+                    <th>EVIDENCIAS</th>
+                    <th>CREADO</th>
+                    <th style="text-align: right;">ACCIONES</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($intents as $intent)
-                <tr>
-                    <td><strong>{{ $intent->intent_number }}</strong></td>
-                    <td>Factura #{{ $intent->invoice_id }}</td>
+                @php
+                    $isTested = session('telemetry') && session('telemetry.intent_number') === $intent->intent_number;
+                @endphp
+                <tr class="{{ $isTested ? 'row-recently-tested' : '' }}">
+                    <td>
+                        <strong style="color: #0f172a;">{{ $intent->intent_number }}</strong>
+                        @if($isTested)
+                            <span style="display: inline-block; background: #00cc66; color: white; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-left: 4px;">RECIÉN EJECUTADO</span>
+                        @endif
+                        <div style="font-size: 11px; color: #94a3b8;">Individual · S/ {{ number_format((float)$intent->expected_amount, 2) }}</div>
+                    </td>
+                    <td>
+                        <strong>{{ $intent->first_name ?? 'Cliente' }} {{ $intent->last_name ?? 'Ficticio' }}</strong>
+                        <div style="font-size: 11px; color: #64748b;">DNI: {{ $intent->identity_document ?? '40127689' }}</div>
+                    </td>
+                    <td>
+                        <a href="/invoices" style="color: #0084ff; font-weight: 600; text-decoration: none;">
+                            INV-00000{{ $intent->invoice_id }}
+                        </a>
+                    </td>
+                    <td>
+                        <strong style="font-size: 13.5px; color: #0f172a;">S/ {{ number_format((float)$intent->expected_amount, 2) }}</strong>
+                    </td>
+                    <td>
+                        <span style="font-family: monospace; font-size: 12px; color: #475569;">{{ $intent->operation_code }}</span>
+                    </td>
                     <td>
                         @if($intent->status === 'validated')
-                            <span class="status-tag tag-validated"><i class="fa-solid fa-check"></i> Validado</span>
+                            <span class="pill-status-paid" style="border-radius: 6px; padding: 2px 8px; font-size: 11px;">
+                                Validado
+                            </span>
                         @elseif($intent->status === 'observed')
-                            <span class="status-tag tag-observed"><i class="fa-solid fa-xmark"></i> Observado</span>
-                        @elseif($intent->status === 'waiting_receiver_event')
-                            <span class="status-tag tag-waiting"><i class="fa-solid fa-clock"></i> En Espera</span>
+                            <span class="pill-status-observed" style="border-radius: 6px; padding: 2px 8px; font-size: 11px;">
+                                Observado
+                            </span>
                         @else
-                            <span class="status-tag tag-pending">{{ $intent->status }}</span>
+                            <span class="pill-status-waiting" style="border-radius: 6px; padding: 2px 8px; font-size: 11px;">
+                                En Espera
+                            </span>
                         @endif
                     </td>
                     <td>
-                        @if($intent->payment_id)
-                            <span class="status-tag tag-paid">Pago #{{ $intent->payment_id }}</span>
+                        <span class="badge-evidence whatsapp">WhatsApp</span>
+                        @if($intent->receiver_event_id)
+                            <span class="badge-evidence receptor">Receptor</span>
                         @else
-                            <span style="color: #94a3b8;">—</span>
+                            <span class="badge-evidence missing">Sin Receptor</span>
                         @endif
                     </td>
-                    <td style="color: #64748b; font-size: 12.5px;">
-                        {{ $intent->observed_reason ?? 'Sin observaciones' }}
+                    <td style="font-size: 12px; color: #64748b;">
+                        {{ date('d/m/Y H:i', strtotime($intent->created_at ?? '2026-11-14 10:00:00')) }}
+                    </td>
+                    <td style="text-align: right;">
+                        <button type="button" class="btn-action-eye" title="Ver Detalles de Validación"
+                                onclick="openAuditModal({
+                                    intent: '{{ $intent->intent_number }}',
+                                    customer: '{{ $intent->first_name ?? 'Cliente' }} {{ $intent->last_name ?? 'Ficticio' }}',
+                                    dni: '{{ $intent->identity_document ?? '40127689' }}',
+                                    invoice: 'INV-00000{{ $intent->invoice_id }}',
+                                    expected: 'S/ {{ number_format((float)$intent->expected_amount, 2) }}',
+                                    operation: '{{ $intent->operation_code }}',
+                                    status: '{{ $intent->status }}',
+                                    clientAmount: 'S/ {{ number_format((float)($intent->client_amount ?? 65.00), 2) }}',
+                                    clientCode: '{{ $intent->client_code ?? '123' }}',
+                                    receiverAmount: '{{ $intent->receiver_amount ? ('S/ '.number_format((float)$intent->receiver_amount, 2)) : 'No recibido' }}',
+                                    receiverCode: '{{ $intent->receiver_code ?? 'N/A' }}',
+                                    reason: '{{ $intent->observed_reason ?? 'Ninguna' }}',
+                                    paymentId: '{{ $intent->payment_id ? ('#'.$intent->payment_id) : 'Ninguno' }}',
+                                    date: '{{ date('d/m/Y H:i:s', strtotime($intent->created_at ?? '2026-11-14 10:00:00')) }}'
+                                })">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">
-                        No se ha ejecutado ningún escenario aún. Presione "Ejecutar Escenario" arriba.
+                    <td colspan="9" style="text-align: center; color: #94a3b8; padding: 24px;">
+                        No hay intenciones registradas. Presione cualquiera de los 4 botones superiores para disparar una prueba.
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-</section>
+</div>
+
+<!-- Modal de Auditoría Técnica Yape -->
+<div id="auditModal" class="crm-modal-overlay" style="display: none;" onclick="if(event.target === this) closeAuditModal();">
+    <div class="crm-modal-card">
+        <div class="crm-modal-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-file-shield"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #0f172a;" id="modalIntentId">Auditoría de Intent</h3>
+                    <div style="font-size: 11px; color: #64748b;">Trazabilidad completa de la transacción y concordancia asíncrona</div>
+                </div>
+            </div>
+            <button type="button" class="crm-modal-close" onclick="closeAuditModal()">&times;</button>
+        </div>
+
+        <div class="crm-modal-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div class="modal-info-box">
+                    <span class="modal-info-label">CLIENTE & IDENTIDAD</span>
+                    <strong id="modalCustomer">-</strong>
+                    <div style="font-size: 11px; color: #64748b;">DNI: <span id="modalDni">-</span></div>
+                </div>
+                <div class="modal-info-box">
+                    <span class="modal-info-label">RECIBO VINCULADO</span>
+                    <strong id="modalInvoice" style="color: #0084ff;">-</strong>
+                    <div style="font-size: 11px; color: #64748b;">Monto Esperado: <span id="modalExpected">-</span></div>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fa-solid fa-code-compare" style="color: #0084ff; margin-right: 4px;"></i> Contraste de Evidencias Asíncronas
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px;">
+                        <div style="color: #15803d; font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> Evidencia WhatsApp (Cliente)</div>
+                        <div style="margin-top: 4px;">Monto Extraído: <strong id="modalClientAmount">-</strong></div>
+                        <div style="color: #64748b; font-size: 11px;">Dígito Seguridad: <span id="modalClientCode">-</span></div>
+                    </div>
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px;">
+                        <div style="color: #0284c7; font-weight: 600;"><i class="fa-brands fa-android"></i> Notificación Android (Receptor)</div>
+                        <div style="margin-top: 4px;">Monto Acreditado: <strong id="modalReceiverAmount">-</strong></div>
+                        <div style="color: #64748b; font-size: 11px;">Dígito Seguridad: <span id="modalReceiverCode">-</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="modal-info-box">
+                    <span class="modal-info-label">ESTADO DEL MOTOR</span>
+                    <div id="modalStatusBadge" style="margin-top: 4px;">-</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Causal: <span id="modalReason">Ninguna</span></div>
+                </div>
+                <div class="modal-info-box">
+                    <span class="modal-info-label">ASIENTO EN PAYMENTS</span>
+                    <strong id="modalPaymentId" style="color: #059669;">-</strong>
+                    <div style="font-size: 11px; color: #64748b;">Fecha: <span id="modalDate">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="crm-modal-footer">
+            <button type="button" class="btn-crm-pill" onclick="closeAuditModal()">Cerrar Auditoría</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openAuditModal(data) {
+    document.getElementById('modalIntentId').innerText = 'Auditoría: ' + data.intent;
+    document.getElementById('modalCustomer').innerText = data.customer;
+    document.getElementById('modalDni').innerText = data.dni;
+    document.getElementById('modalInvoice').innerText = data.invoice;
+    document.getElementById('modalExpected').innerText = data.expected;
+    document.getElementById('modalClientAmount').innerText = data.clientAmount;
+    document.getElementById('modalClientCode').innerText = data.clientCode;
+    document.getElementById('modalReceiverAmount').innerText = data.receiverAmount;
+    document.getElementById('modalReceiverCode').innerText = data.receiverCode;
+    document.getElementById('modalReason').innerText = data.reason;
+    document.getElementById('modalPaymentId').innerText = data.paymentId;
+    document.getElementById('modalDate').innerText = data.date;
+
+    const badgeContainer = document.getElementById('modalStatusBadge');
+    if (data.status === 'validated') {
+        badgeContainer.innerHTML = '<span class="pill-status-paid">✔ Validado (Cobrado)</span>';
+    } else if (data.status === 'observed') {
+        badgeContainer.innerHTML = '<span class="pill-status-observed">✖ Observado (Rechazo Seguro)</span>';
+    } else {
+        badgeContainer.innerHTML = '<span class="pill-status-waiting">⏳ En Espera de Receptor</span>';
+    }
+
+    document.getElementById('auditModal').style.display = 'flex';
+}
+
+function closeAuditModal() {
+    document.getElementById('auditModal').style.display = 'none';
+}
+</script>
 @endsection
